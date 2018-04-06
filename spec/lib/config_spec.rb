@@ -479,4 +479,26 @@ describe Doorkeeper, 'configuration' do
       expect(subject.api_only).to be_truthy
     end
   end
+
+  describe 'disable_strict_content_type?' do
+    context 'when not configured' do
+      it 'is deprecated to return false by default' do
+        expect(ActiveSupport::Deprecation).to receive(:warn)
+          .with(Doorkeeper::Config::CONT_TYPE_WARN)
+        expect(subject.disable_strict_content_type?).to be_falsey
+      end
+    end
+
+    context 'when disabled in config' do
+      it 'remains false without any deprication warning' do
+        Doorkeeper.configure do
+          orm DOORKEEPER_ORM
+          disable_strict_content_type
+        end
+
+        expect(ActiveSupport::Deprecation).not_to receive(:warn)
+        expect(subject.disable_strict_content_type?).to be_truthy
+      end
+    end
+  end
 end

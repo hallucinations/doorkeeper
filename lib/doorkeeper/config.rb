@@ -39,6 +39,12 @@ module Doorkeeper
   end
 
   class Config
+    CONT_TYPE_WARN =  "As per https://tools.ietf.org/html/rfc6749#section-4.1.3, the " \
+                      "Access Token Requestmedia type should be " \
+                      "application/x-www-form-urlencoded. This would be the default behavior in " \
+                      "Doorkeeper 5. If you still want the existing behaviour, please configure " \
+                      "Doorkeeper using disable_strict_content_type"
+
     class Builder
       def initialize(&block)
         @config = Config.new
@@ -138,6 +144,10 @@ module Doorkeeper
       # (disabled by default)
       def enforce_configured_scopes
         @config.instance_variable_set(:@enforce_configured_scopes, true)
+      end
+
+      def disable_strict_content_type
+        @config.instance_variable_set(:@disable_strict_content_type, true)
       end
     end
 
@@ -292,6 +302,13 @@ module Doorkeeper
     def enforce_configured_scopes?
       @enforce_configured_scopes ||= false
       !!@enforce_configured_scopes
+    end
+
+    def disable_strict_content_type?
+      ActiveSupport::Deprecation.warn CONT_TYPE_WARN if @disable_strict_content_type.nil?
+
+      @disable_strict_content_type ||= false
+      !!@disable_strict_content_type
     end
 
     def enable_application_owner?
