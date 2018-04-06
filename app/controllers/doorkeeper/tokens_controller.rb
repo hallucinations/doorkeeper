@@ -1,10 +1,15 @@
 module Doorkeeper
   class TokensController < Doorkeeper::ApplicationMetalController
+    TOKEN_CREATE_REQUEST_CTYPE = 'application/x-www-form-urlencoded'.freeze
+
     def create
+      validate_token_create
       response = authorize_response
       headers.merge! response.headers
       self.response_body = response.body.to_json
       self.status = response.status
+    rescue Doorkeeper::Errors::InvalidContentType => e
+      handle_invalid_content_type e
     rescue Errors::DoorkeeperError => e
       handle_token_exception e
     end
@@ -88,6 +93,15 @@ module Doorkeeper
 
     def authorize_response
       @authorize_response ||= strategy.authorize
+    end
+
+    def validate_token_create
+      fail Doorkeeper::Errors::InvalidContentType if content_type_not_allowed?
+    end
+
+    def content_type_not_allowed?
+      Doorkeeper.configuration.disable_strict_content_type? &&
+        request.content_type != TOKEN_CREATE_REQUEST_CTYPE
     end
   end
 end

@@ -14,6 +14,21 @@ describe Doorkeeper::TokensController do
     end
   end
 
+  describe 'when request is not application/x-www-form-urlencoded' do
+    before do
+      config_is_set(:disable_strict_content_type, true)
+    end
+
+    it 'returns the error response' do
+      token = double(:token, authorize: true)
+      allow(controller).to receive(:token) { token }
+      @request.env['CONTENT_TYPE'] = 'application/json'
+      post :create
+
+      expect(response.status).to eq 415
+    end
+  end
+
   describe 'when authorization has failed' do
     it 'returns the error response' do
       token = double(:token, authorize: false)

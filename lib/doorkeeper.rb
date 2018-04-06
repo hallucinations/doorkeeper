@@ -34,6 +34,7 @@ require 'doorkeeper/oauth/token'
 require 'doorkeeper/oauth/token_introspection'
 require 'doorkeeper/oauth/invalid_token_response'
 require 'doorkeeper/oauth/forbidden_token_response'
+require 'doorkeeper/oauth/invalid_content_type_response'
 
 require 'doorkeeper/models/concerns/orderable'
 require 'doorkeeper/models/concerns/scopes'

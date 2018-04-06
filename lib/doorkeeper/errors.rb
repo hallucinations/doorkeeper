@@ -36,6 +36,12 @@ module Doorkeeper
       end
     end
 
+    class InvalidContentType < DoorkeeperError
+      def type
+        :unsupported_media_type
+      end
+    end
+
     UnableToGenerateToken = Class.new(DoorkeeperError)
     TokenGeneratorNotFound = Class.new(DoorkeeperError)
   end

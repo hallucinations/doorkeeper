@@ -41,15 +41,23 @@ module Doorkeeper
         OAuth::ErrorResponse.new name: exception.type, state: params[:state]
       end
 
+      def handle_invalid_content_type(exception)
+        error = OAuth::InvalidContentTypeResponse.new name: exception.type
+        handle_error(error)
+      end
+
       def handle_token_exception(exception)
-        error = get_error_response_from_exception exception
-        headers.merge! error.headers
-        self.response_body = error.body.to_json
-        self.status        = error.status
+        handle_error(get_error_response_from_exception(exception))
       end
 
       def skip_authorization?
         !!instance_exec([@server.current_resource_owner, @pre_auth.client], &Doorkeeper.configuration.skip_authorization)
+      end
+
+      def handle_error(error)
+        headers.merge! error.headers
+        self.response_body = error.body.to_json
+        self.status        = error.status
       end
     end
   end
